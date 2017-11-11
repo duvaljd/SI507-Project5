@@ -1,10 +1,10 @@
 ## IMPORT STATEMENTS ##
-import json
-import secret_data
-import requests_oauthlib
-import webbrowser
-
+import csv
 from datetime import datetime
+import json
+import requests_oauthlib
+import secret_data
+import webbrowser
 ## /IMPORT STATEMENTS ##
 
 ## CACHING SETUP ##
@@ -176,3 +176,32 @@ if __name__ == "__main__":
         exit()
 ### /OAuth Init ###
 ## /OAUTH ##
+
+## PROGRAM ##
+
+### Classes ###
+class Post(object):
+    def __init__(self, postDict):
+        self.type = postDict['type']
+        self.date = postDict['data']
+        self.notes = postDict['note_count']
+        self.url = postDict['short_url']
+        self.summary = postDict['summary']
+
+class Blog(object):
+    def __init__(self, response):        
+        self.title = response['blog']['title']
+        self.totalPosts = response['blog']['total_posts']
+        self.postDict = response['posts']
+
+    def __str__(self):
+        return("The Tumbler {} has {} posts".format(self.title, self.totalPosts))
+
+    def orderPosts(self, postDict=self.postDict)
+        posts = []
+        for dixn in postDict:
+            posts.append(Post(dixn))
+
+        orderedPosts = sorted(posts, key=lambda k: k['note_count'])
+### /Classes ###
+## /PROGRAM ##

@@ -1,10 +1,6 @@
 import unittest
 from SI507project5_code import *
 
-
-
-
-
 class test_cacheFiles(unittest.TestCase):
     def setUp(self):
         self.data = open("cache_contents.json",'r')
