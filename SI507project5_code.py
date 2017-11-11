@@ -163,7 +163,7 @@ def get_data_from_api(request_url,service_ident, params_diction, expire_in_days=
         data = json.loads(data_str)
         set_in_data_cache(ident, data, expire_in_days)
 
-    return data
+    return data[resp.url]['values']['response']
 ### /OAuth Functions ###
 
 ### OAuth Init ###
@@ -178,7 +178,6 @@ if __name__ == "__main__":
 ## /OAUTH ##
 
 ## PROGRAM ##
-
 ### Classes ###
 class Post(object):
     def __init__(self, postDict):
@@ -203,5 +202,28 @@ class Blog(object):
             posts.append(Post(dixn))
 
         orderedPosts = sorted(posts, key=lambda k: k['note_count'])
+        return orderedPosts
 ### /Classes ###
+
+### Functions ###
+def getBlog(searchTerm):
+    baseURL = "https://api.tumblr.com/v2/blog/{}/posts".format(searchTerm)
+    searchParams = {
+        'api_key': CLIENT_KEY,
+        'limit': 10,
+        'notes_info': True
+    }
+    get_data_from_api(baseURL,"Tumblr",searchParams)
+
+def makeCSV(postsList):
+    with open(fileName, "w", newLine="") as f:
+        writer = csv.writer(f)
+
+        writer.writerow(['Type','Date','Notes','Short URL','Summary'])
+
+        for post in postsList:
+            writer.writerow([post.type, post.date, post.notes, post.url, post.summary.strip()])
+
+    f.close()
+### /Functions ###
 ## /PROGRAM ##
