@@ -1,1 +1,8 @@
-Put your Project 5 brief explanation, as directed, here.
+I am accessing the Tumblr search API and gathering:
+	- 100 blog posts for each of 2 blogs I find interesting.
+	- For each blog post, I'll be accessing the type of content, the date it was posted, the number of notes, reblogs, and likes for the post, the short url for the post, and the summary of the post.
+	- Getting some of the info (reblogs and likes) will require digging a little further into the data to retrieve.
+	- I'll write 2 CSV files, one for each search.
+	- 7 columns in each CSV file: type, date, notes, reblogs, likes, short url, summary
+	- The data will be sorted by number of notes in descending order.
+	- URL for the API: https://api.tumblr.com/v2/blog/{blog-identifier}/posts[/type]?api_key={key}&[optional-params=]
