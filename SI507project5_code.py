@@ -61,7 +61,7 @@ def get_from_cache(identifier, dictionary):
             data = dictionary[identifier]['values']
     else:
         data = None
-    return data
+    return(data)
 
 
 def set_in_data_cache(identifier, data, expire_in_days):
@@ -163,7 +163,7 @@ def get_data_from_api(request_url,service_ident, params_diction, expire_in_days=
         data = json.loads(data_str)
         set_in_data_cache(ident, data, expire_in_days)
 
-    return data[resp.url]['values']['response']
+    return(data)
 ### /OAuth Functions ###
 
 ### OAuth Init ###
@@ -179,30 +179,30 @@ if __name__ == "__main__":
 
 ## PROGRAM ##
 ### Classes ###
-class Post(object):
-    def __init__(self, postDict):
-        self.type = postDict['type']
-        self.date = postDict['data']
-        self.notes = postDict['note_count']
-        self.url = postDict['short_url']
-        self.summary = postDict['summary']
-
 class Blog(object):
-    def __init__(self, response):        
-        self.title = response['blog']['title']
-        self.totalPosts = response['blog']['total_posts']
-        self.postDict = response['posts']
+    def __init__(self, dxn):        
+        self.title = dxn['blog']['title']
+        self.totalPosts = dxn['blog']['total_posts']
+        self.postList = dxn['posts']
 
     def __str__(self):
-        return("The Tumbler {} has {} posts".format(self.title, self.totalPosts))
+        return("The Tumblr '{}' has {} posts. Please check the .csv file for more information.\n".format(self.title, self.totalPosts))
 
-    def orderPosts(self, postDict=self.postDict)
+    def orderPosts(self):
         posts = []
-        for dixn in postDict:
+        for dixn in self.postList:
             posts.append(Post(dixn))
 
-        orderedPosts = sorted(posts, key=lambda k: k['note_count'])
+        orderedPosts = sorted(posts, key=lambda k: k.notes, reverse=True)
         return orderedPosts
+
+class Post(object):
+    def __init__(self, post):
+        self.type = post['type']
+        self.date = post['date']
+        self.notes = post['note_count']
+        self.url = post['short_url']
+        self.summary = post['summary']
 ### /Classes ###
 
 ### Functions ###
@@ -210,20 +210,32 @@ def getBlog(searchTerm):
     baseURL = "https://api.tumblr.com/v2/blog/{}/posts".format(searchTerm)
     searchParams = {
         'api_key': CLIENT_KEY,
-        'limit': 10,
+        'limit': 50,
         'notes_info': True
     }
-    get_data_from_api(baseURL,"Tumblr",searchParams)
 
-def makeCSV(postsList):
-    with open(fileName, "w", newLine="") as f:
+    data = get_data_from_api(baseURL,"Tumblr",searchParams)
+
+    return(data)
+
+def makeCSV(postsList, fileName):
+    with open(fileName, "w", encoding='utf-8', newline="") as f:
         writer = csv.writer(f)
 
         writer.writerow(['Type','Date','Notes','Short URL','Summary'])
 
         for post in postsList:
-            writer.writerow([post.type, post.date, post.notes, post.url, post.summary.strip()])
+            writer.writerow([post.type, post.date, post.notes, post.url, post.summary])
 
     f.close()
+
 ### /Functions ###
+
+blogList = ["colorfulgradients", "ifpaintingscouldtext"]
+
+for item in blogList:
+    result = Blog(getBlog(item)['response'])
+    print(result)
+    makeCSV(result.orderPosts(), "{}.csv".format(item))
+
 ## /PROGRAM ##
